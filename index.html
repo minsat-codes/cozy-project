@@ -1,1 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Retro Widgets</title>
+    <!-- Google Fonts for retro pixel vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Global Styles ===== */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f9f3f3; /* default pastel */
+            transition: background-color 0.5s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
+        h1, h2 {
+            text-align: center;
+        }
+
+        /* ===== Color Wheel ===== */
+        #colorPicker {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        /* ===== Container for Widgets ===== */
+        .widgets-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 100px;
+        }
+
+        /* ===== Widget Card ===== */
+        .widget-card {
+            background-color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 280px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .widget-card:hover {
+            transform: translateY(-5px);
+        }
+
+        input, button {
+            font-family: 'Press Start 2P', cursive;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #ffb3c1;
+            color: #fff;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff7f94;
+        }
+
+        /* ===== Quote Section ===== */
+        #quoteDisplay {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        /* ===== Clock ===== */
+        #clock {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* ===== Retro Style Footer ===== */
+        footer {
+            margin-top: 50px;
+            font-size: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== Color Wheel to Change Background ===== -->
+    <input type="color" id="colorPicker" title="Pick a background color">
+
+    <h1>🕹 Cozy Retro Widgets 🕹</h1>
+
+    <!-- ===== Widgets Container ===== -->
+    <div class="widgets-container">
+
+        <!-- ===== Quote Generator Widget ===== -->
+        <div class="widget-card">
+            <h2>Random Quote</h2>
+            <button id="quoteBtn">Get Quote</button>
+            <p id="quoteDisplay">Your cozy quote will appear here...</p>
+        </div>
+
+        <!-- ===== Simple Calculator Widget ===== -->
+        <div class="widget-card">
+            <h2>Calculator</h2>
+            <input type="text" id="calcInput" placeholder="0" readonly>
+            <div>
+                <!-- Calculator Buttons -->
+                <button onclick="addCalc('1')">1</button>
+                <button onclick="addCalc('2')">2</button>
+                <button onclick="addCalc('3')">3</button>
+                <button onclick="addCalc('+')">+</button>
+            </div>
+            <div>
+                <button onclick="addCalc('4')">4</button>
+                <button onclick="addCalc('5')">5</button>
+                <button onclick="addCalc('6')">6</button>
+                <button onclick="addCalc('-')">-</button>
+            </div>
+            <div>
+                <button onclick="addCalc('7')">7</button>
+                <button onclick="addCalc('8')">8</button>
+                <button onclick="addCalc('9')">9</button>
+                <button onclick="addCalc('*')">*</button>
+            </div>
+            <div>
+                <button onclick="addCalc('0')">0</button>
+                <button onclick="clearCalc()">C</button>
+                <button onclick="calculate()">=</button>
+                <button onclick="addCalc('/')">/</button>
+            </div>
+        </div>
+
+        <!-- ===== Clock Widget ===== -->
+        <div class="widget-card">
+            <h2>Clock</h2>
+            <p id="clock">00:00:00</p>
+        </div>
+
+        <!-- ===== Tip Calculator Widget ===== -->
+        <div class="widget-card">
+            <h2>Tip Calculator</h2>
+            <input type="number" id="bill" placeholder="Bill Amount">
+            <input type="number" id="tip" placeholder="Tip %">
+            <button onclick="calculateTip()">Calculate</button>
+            <p id="tipResult">Your tip will appear here</p>
+        </div>
+
+    </div>
+
+    <footer>Made cozy with ☕ & retro vibes</footer>
+
+    <!-- ===== JavaScript ===== -->
+    <script>
+        /* ===== Color Picker JS ===== */
+        const colorPicker = document.getElementById('colorPicker');
+        colorPicker.addEventListener('input', (e) => {
+            document.body.style.backgroundColor = e.target.value;
+        });
+
+        /* ===== Quote Generator JS ===== */
+        const quotes = [
+            "Stay cozy, stay creative ☕",
+            "Pixels make life colorful 🎮",
+            "One code line at a time...",
+            "Retro vibes, modern mind 🌸",
+            "Keep calm and code on 💻"
+        ];
+        const quoteBtn = document.getElementById('quoteBtn');
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        quoteBtn.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            quoteDisplay.textContent = quotes[randomIndex];
+        });
+
+        /* ===== Calculator JS ===== */
+        let calcValue = "";
+        const calcInput = document.getElementById('calcInput');
+
+        function addCalc(val) {
+            calcValue += val;
+            calcInput.value = calcValue;
+        }
+
+        function clearCalc() {
+            calcValue = "";
+            calcInput.value = "";
+        }
+
+        function calculate() {
+            try {
+                calcValue = eval(calcValue);
+                calcInput.value = calcValue;
+            } catch {
+                calcInput.value = "Error";
+                calcValue = "";
+            }
+        }
+
+        /* ===== Clock JS ===== */
+        const clock = document.getElementById('clock');
+        function updateClock() {
+            const now = new Date();
+            clock.textContent = now.toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* ===== Tip Calculator JS ===== */
+        function calculateTip() {
+            const bill = parseFloat(document.getElementById('bill').value);
+            const tip = parseFloat(document.getElementById('tip').value);
+            if (!bill || !tip) {
+                document.getElementById('tipResult').textContent = "Enter numbers!";
+                return;
+            }
+            const totalTip = bill * (tip / 100);
+            document.getElementById('tipResult').textContent = "Tip: $" + totalTip.toFixed(2);
+        }
+    </script>
+</body>
+</html>
