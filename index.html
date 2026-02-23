@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cozy Retro Widgets</title>
-    <!-- Google Fonts for retro pixel vibe -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         /* ===== Global Styles ===== */
@@ -12,17 +11,35 @@
             margin: 0;
             padding: 0;
             font-family: 'Press Start 2P', cursive;
-            background-color: #f9f3f3; /* default pastel */
+            background-color: #f9f3f3;
             transition: background-color 0.5s;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
         h1, h2 {
             text-align: center;
+        }
+
+        /* ===== Floating Pixel Animation Container ===== */
+        .pixel {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 182, 193, 0.7); /* pastel pink */
+            opacity: 0.8;
+            border-radius: 2px;
+            animation: float 10s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) translateX(0px); opacity: 0.8; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(-800px) translateX(50px); opacity: 0; }
         }
 
         /* ===== Color Wheel ===== */
@@ -36,6 +53,7 @@
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 100;
         }
 
         /* ===== Container for Widgets ===== */
@@ -45,6 +63,8 @@
             justify-content: center;
             gap: 30px;
             margin-top: 100px;
+            z-index: 1;
+            position: relative;
         }
 
         /* ===== Widget Card ===== */
@@ -94,7 +114,33 @@
             margin-top: 10px;
         }
 
-        /* ===== Retro Style Footer ===== */
+        /* ===== To-Do List ===== */
+        #todoList input {
+            width: 80%;
+        }
+
+        #todoItems {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        #todoItems li {
+            background: #ffe4e1;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #todoItems li.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
         footer {
             margin-top: 50px;
             font-size: 10px;
@@ -103,27 +149,29 @@
     </style>
 </head>
 <body>
-    <!-- ===== Color Wheel to Change Background ===== -->
+    <!-- ===== Color Picker ===== -->
     <input type="color" id="colorPicker" title="Pick a background color">
 
     <h1>🕹 Cozy Retro Widgets 🕹</h1>
 
+    <!-- ===== Floating Pixels ===== -->
+    <div id="pixelContainer"></div>
+
     <!-- ===== Widgets Container ===== -->
     <div class="widgets-container">
 
-        <!-- ===== Quote Generator Widget ===== -->
+        <!-- ===== Quote Generator ===== -->
         <div class="widget-card">
             <h2>Random Quote</h2>
             <button id="quoteBtn">Get Quote</button>
             <p id="quoteDisplay">Your cozy quote will appear here...</p>
         </div>
 
-        <!-- ===== Simple Calculator Widget ===== -->
+        <!-- ===== Calculator ===== -->
         <div class="widget-card">
             <h2>Calculator</h2>
             <input type="text" id="calcInput" placeholder="0" readonly>
             <div>
-                <!-- Calculator Buttons -->
                 <button onclick="addCalc('1')">1</button>
                 <button onclick="addCalc('2')">2</button>
                 <button onclick="addCalc('3')">3</button>
@@ -149,19 +197,18 @@
             </div>
         </div>
 
-        <!-- ===== Clock Widget ===== -->
+        <!-- ===== Clock ===== -->
         <div class="widget-card">
             <h2>Clock</h2>
             <p id="clock">00:00:00</p>
         </div>
 
-        <!-- ===== Tip Calculator Widget ===== -->
-        <div class="widget-card">
-            <h2>Tip Calculator</h2>
-            <input type="number" id="bill" placeholder="Bill Amount">
-            <input type="number" id="tip" placeholder="Tip %">
-            <button onclick="calculateTip()">Calculate</button>
-            <p id="tipResult">Your tip will appear here</p>
+        <!-- ===== To-Do List ===== -->
+        <div class="widget-card" id="todoList">
+            <h2>Retro To-Do</h2>
+            <input type="text" id="taskInput" placeholder="New task">
+            <button onclick="addTask()">Add</button>
+            <ul id="todoItems"></ul>
         </div>
 
     </div>
@@ -170,13 +217,13 @@
 
     <!-- ===== JavaScript ===== -->
     <script>
-        /* ===== Color Picker JS ===== */
+        /* ===== Color Picker ===== */
         const colorPicker = document.getElementById('colorPicker');
-        colorPicker.addEventListener('input', (e) => {
+        colorPicker.addEventListener('input', e => {
             document.body.style.backgroundColor = e.target.value;
         });
 
-        /* ===== Quote Generator JS ===== */
+        /* ===== Quote Generator ===== */
         const quotes = [
             "Stay cozy, stay creative ☕",
             "Pixels make life colorful 🎮",
@@ -191,31 +238,17 @@
             quoteDisplay.textContent = quotes[randomIndex];
         });
 
-        /* ===== Calculator JS ===== */
+        /* ===== Calculator ===== */
         let calcValue = "";
         const calcInput = document.getElementById('calcInput');
-
-        function addCalc(val) {
-            calcValue += val;
-            calcInput.value = calcValue;
-        }
-
-        function clearCalc() {
-            calcValue = "";
-            calcInput.value = "";
-        }
-
+        function addCalc(val) { calcValue += val; calcInput.value = calcValue; }
+        function clearCalc() { calcValue = ""; calcInput.value = ""; }
         function calculate() {
-            try {
-                calcValue = eval(calcValue);
-                calcInput.value = calcValue;
-            } catch {
-                calcInput.value = "Error";
-                calcValue = "";
-            }
+            try { calcValue = eval(calcValue); calcInput.value = calcValue; }
+            catch { calcInput.value = "Error"; calcValue = ""; }
         }
 
-        /* ===== Clock JS ===== */
+        /* ===== Clock ===== */
         const clock = document.getElementById('clock');
         function updateClock() {
             const now = new Date();
@@ -224,16 +257,40 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        /* ===== Tip Calculator JS ===== */
-        function calculateTip() {
-            const bill = parseFloat(document.getElementById('bill').value);
-            const tip = parseFloat(document.getElementById('tip').value);
-            if (!bill || !tip) {
-                document.getElementById('tipResult').textContent = "Enter numbers!";
-                return;
-            }
-            const totalTip = bill * (tip / 100);
-            document.getElementById('tipResult').textContent = "Tip: $" + totalTip.toFixed(2);
+        /* ===== Retro To-Do List ===== */
+        const todoItems = document.getElementById('todoItems');
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const task = taskInput.value.trim();
+            if (!task) return;
+            const li = document.createElement('li');
+            li.textContent = task;
+
+            // Add done/remove buttons
+            const doneBtn = document.createElement('button');
+            doneBtn.textContent = "✓";
+            doneBtn.onclick = () => li.classList.toggle('completed');
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = "✗";
+            removeBtn.onclick = () => li.remove();
+
+            li.appendChild(doneBtn);
+            li.appendChild(removeBtn);
+            todoItems.appendChild(li);
+            taskInput.value = "";
+        }
+
+        /* ===== Floating Pixels ===== */
+        const pixelContainer = document.getElementById('pixelContainer');
+        const colors = ["#ffb3c1","#f5c7b8","#d3f8e2","#c9f0ff","#fff0b3"];
+        for(let i=0; i<30; i++){
+            const pixel = document.createElement('div');
+            pixel.classList.add('pixel');
+            pixel.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+            pixel.style.left = Math.random() * window.innerWidth + 'px';
+            pixel.style.top = Math.random() * window.innerHeight + 'px';
+            pixel.style.animationDuration = (5 + Math.random()*5) + 's';
+            pixelContainer.appendChild(pixel);
         }
     </script>
 </body>
